@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Homatic · Alat &amp; Rangkaian</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <section class="sec hero">
+        <div class="title">
+          <span class="tag">Bagian 3 &amp; 4</span>
+          <h1>Alat, Bahan &amp; <span>Rangkaian</span> 🔧</h1>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="title"><h2>Alat dan Bahan</h2></div>
+        <div class="card flat wide" style="overflow-x: auto">
+          <table>
+            <tr>
+              <th>No</th>
+              <th>Alat / Bahan</th>
+              <th>Jumlah</th>
+              <th>Fungsi</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>ESP32 Dev Module</td>
+              <td>1</td>
+              <td>Mikrokontroler utama dan modul Wi-Fi</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Sensor LDR</td>
+              <td>1</td>
+              <td>Membaca intensitas cahaya (komponen pasif)</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Sensor Hujan</td>
+              <td>1</td>
+              <td>Mendeteksi tetesan air (komponen aktif)</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Motor Servo SG90 / MG996R</td>
+              <td>1</td>
+              <td>Menarik atau mengeluarkan jemuran (0° / 90°)</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>LED Lampu</td>
+              <td>1</td>
+              <td>Indikator lampu rumah</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Resistor</td>
+              <td>Secukupnya</td>
+              <td>Pembatas arus LED dan pembagi tegangan LDR</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Kabel jumper dan breadboard</td>
+              <td>Secukupnya</td>
+              <td>Menghubungkan rangkaian</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Catu daya 5 V / kabel USB</td>
+              <td>1</td>
+              <td>Sumber daya rangkaian</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Arduino IDE dan Blynk IoT</td>
+              <td>-</td>
+              <td>Perangkat lunak pemrograman dan monitoring</td>
+            </tr>
+            <!-- hapus atau ubah baris yang tidak sesuai dengan alatmu -->
+          </table>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="title"><h2>Gambar Rangkaian 🔌</h2></div>
+        <div class="split">
+          <div class="col">
+            <figure class="card flat shot" data-f="rangkaian1.jpg">
+              <img
+                src="assets/rangkaian1.jpeg"
+                alt="Gambar rangkaian 1"
+                onerror="this.parentElement.classList.add('kosong')"
+              />
+              <figcaption>Gambar rangkaian 1</figcaption>
+            </figure>
+          </div>
+          <i></i>
+          <div class="col">
+            <figure class="card flat shot" data-f="rangkaian2.jpg">
+              <img
+                src="assets/rangkaian2.jpeg"
+                alt="Gambar rangkaian 2"
+                onerror="this.parentElement.classList.add('kosong')"
+              />
+              <figcaption>Gambar rangkaian 2</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="card flat wide" style="margin-top: 20px; overflow-x: auto">
+          <table>
+            <tr>
+              <th>Komponen</th>
+              <th>Pin ESP32</th>
+            </tr>
+            <tr>
+              <td>LDR</td>
+              <td>D34</td>
+            </tr>
+            <tr>
+              <td>Sensor Hujan</td>
+              <td>D27</td>
+            </tr>
+            <tr>
+              <td>Servo</td>
+              <td>D13</td>
+            </tr>
+            <tr>
+              <td>LED Lampu</td>
+              <td>D4</td>
+            </tr>
+            <!-- ganti "GPIO ..." dengan nomor pin yang kamu pakai -->
+          </table>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

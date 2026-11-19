@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Homatic · Kode Program</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <section class="sec hero">
+        <div class="title">
+          <span class="tag">Bagian 6</span>
+          <h1>Kode <span>Program</span> 💻</h1>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="card flat wide">
+          <h3>Program ESP32 (Arduino IDE)</h3>
+          <p>
+            Library yang digunakan: Blynk dan ESP32Servo. Isi nama Wi-Fi, kata
+            sandi, dan token Blynk sebelum diunggah.
+          </p>
+          <div
+            class="row"
+            style="justify-content: flex-start; margin-top: 12px"
+          >
+            <button class="btn" id="salin">Salin kode 📋</button>
+          </div>
+          <pre id="kode">
+    #define BLYNK_TEMPLATE_ID   "TMPL6jGFcMPfr"
+#define BLYNK_TEMPLATE_NAME "Homatic"   
+#define BLYNK_AUTH_TOKEN    "KawpYH2RnO2rRaj-zSOPKIaM6VO2e3gf"
+
+#include &lt;WiFi.h&gt;
+#include &lt;WiFiMulti.h&gt; 
+#include &lt;BlynkSimpleEsp32.h&gt;
+#include &lt;ESP32Servo.h&gt;
+
+WiFiMulti wifiMulti;
+
+// PIN FISIK 
+#define PIN_LDR       34
+#define PIN_RAIN      27
+#define PIN_SERVO     13  
+#define PIN_LED_LAMP  4   
+
+// Virtual pin Blynk
+#define VPIN_LDR      V0
+#define VPIN_LAMPU    V1
+#define VPIN_HUJAN    V2
+#define VPIN_JEMURAN  V3
+#define VPIN_MODE     V4
+
+Servo servoJemuran;
+BlynkTimer timer;
+
+int  nilaiLDR     = 0;
+bool statusHujan   = false;
+bool statusGelap   = false;
+bool lampuNyala    = false;
+bool jemuranKeluar = true;
+bool modeOtomatis  = true;
+
+const int BATAS_GELAP = 2000; 
+
+void tarikJemuran() {
+  servoJemuran.write(0);
+  jemuranKeluar = false;
+  if (Blynk.connected()) Blynk.virtualWrite(VPIN_JEMURAN, 0); 
+}
+
+void keluarkanJemuran() {
+  servoJemuran.write(90);
+  jemuranKeluar = true;
+  if (Blynk.connected()) Blynk.virtualWrite(VPIN_JEMURAN, 1); 
+}
+
+void bacaSensorDanKirim() {
+  // 1. Membaca LDR (Aman)
+  nilaiLDR = analogRead(PIN_LDR);
+  statusGelap = (nilaiLDR > BATAS_GELAP);
+
+  // 2. Membaca Sensor Hujan di Pin 27 secara aman (Anti-Crash)
+  // Menggunakan digitalRead biasa yang sudah disinkronkan jalurnya
+  statusHujan = (digitalRead(PIN_RAIN) == LOW); 
+
+  // Kirim data ke Blynk Cloud jika terhubung
+  if (Blynk.connected()) {
+    Blynk.virtualWrite(VPIN_LDR, nilaiLDR);
+    Blynk.virtualWrite(VPIN_HUJAN, statusHujan ? 1 : 0);
+  }
+
+  // Logika Otomatis
+  if (modeOtomatis) {
+    lampuNyala = statusGelap;
+    digitalWrite(PIN_LED_LAMP, lampuNyala ? HIGH : LOW);
+    
+    if (Blynk.connected()) {
+      Blynk.virtualWrite(VPIN_LAMPU, lampuNyala ? 1 : 0);
+    }
+
+    if (statusHujan || statusGelap) {
+      if (jemuranKeluar) tarikJemuran();
+    } else {
+      if (!jemuranKeluar) keluarkanJemuran();
+    }
+  }
+
+  // Monitor Log lewat Serial
+  Serial.print("LDR: "); Serial.print(nilaiLDR);
+  Serial.print(" | Gelap: "); Serial.print(statusGelap ? "YA" : "TIDAK");
+  Serial.print(" | Hujan: "); Serial.print(statusHujan ? "YA" : "TIDAK");
+  Serial.print(" | Lampu: "); Serial.print(lampuNyala ? "NYALA" : "MATI");
+  Serial.print(" | Jemuran: "); Serial.println(jemuranKeluar ? "KELUAR" : "MASUK");
+}
+
+void cekKoneksi() {
+  if (WiFi.status() == WL_CONNECTED && !Blynk.connected()) {
+    Blynk.connect();
+  }
+}
+
+BLYNK_CONNECTED() {
+  Blynk.syncAll();
+}
+
+BLYNK_WRITE(VPIN_MODE) {
+  modeOtomatis = param.asInt();
+}
+
+BLYNK_WRITE(VPIN_LAMPU) {
+  if (!modeOtomatis) { 
+    lampuNyala = param.asInt();
+    digitalWrite(PIN_LED_LAMP, lampuNyala ? HIGH : LOW);
+  } else {
+    Blynk.virtualWrite(VPIN_LAMPU, lampuNyala ? 1 : 0);
+  }
+}
+
+BLYNK_WRITE(VPIN_JEMURAN) {
+  if (!modeOtomatis) { 
+    int statusTombol = param.asInt();
+    if (statusTombol == 1) keluarkanJemuran();
+    else tarikJemuran();
+  } else {
+    Blynk.virtualWrite(VPIN_JEMURAN, jemuranKeluar ? 1 : 0);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000); // Jeda pengaman sistem saat menyala
+
+  pinMode(PIN_LDR, INPUT);
+  pinMode(PIN_RAIN, INPUT_PULLUP); // Mengunci pin 27 agar stabil kinerjanya
+  pinMode(PIN_LED_LAMP, OUTPUT);
+
+  servoJemuran.attach(PIN_SERVO);
+  servoJemuran.write(90); 
+
+  // DAFTAR WI-FI
+  wifiMulti.addAP("Sekawan putra", "UPINIPIN");
+  wifiMulti.addAP("A.P", "salsacantik");
+  wifiMulti.addAP("ROOM-35", "akucahgrisa");
+  wifiMulti.addAP("ROOM-36", "akucahgrisa");
+  wifiMulti.addAP("ROOM-38", "akucahgrisa");
+  wifiMulti.addAP("Grisanet-34", "akucahgrisa");
+  wifiMulti.addAP("GRISANET-34", "akucahgrisa");
+
+  Serial.println("Mencari jaringan Wi-Fi terdaftar...");
+  while (wifiMulti.run() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWi-Fi Terhubung!");
+  
+  Blynk.config(BLYNK_AUTH_TOKEN);
+  
+  unsigned long batasWaktu = millis();
+  while (!Blynk.connected() && millis() - batasWaktu < 10000) {
+    Blynk.connect();
+    delay(500);
+    Serial.print("#");
+  }
+
+  if (Blynk.connected()) {
+    Serial.println("\nTerhubung ke Blynk Cloud dengan Sukses!");
+  } else {
+    Serial.println("\nGagal terhubung ke Blynk Cloud.");
+  }
+
+  timer.setInterval(1000L, bacaSensorDanKirim); 
+  timer.setInterval(5000L, cekKoneksi);         
+}
+
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    Blynk.run();
+  }
+  timer.run();
+}
+</pre
+          >
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

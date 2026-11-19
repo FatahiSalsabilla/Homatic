@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Homatic · Prinsip Kerja</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <section class="sec hero">
+        <div class="title">
+          <span class="tag">Bagian 2</span>
+          <h1>Prinsip <span>Kerja</span> ⚙️</h1>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="title"><h2>Alur sistem</h2></div>
+        <div class="split">
+          <div class="col">
+            <div class="card">
+              <span class="ico">📥</span>
+              <h3>Input (Sensor)</h3>
+              <p>
+                Sensor LDR membaca intensitas cahaya (0–4095), sedangkan sensor
+                hujan mendeteksi ada atau tidaknya air.
+              </p>
+            </div>
+            <div class="card">
+              <span class="ico">🧠</span>
+              <h3>Proses (ESP32)</h3>
+              <p>
+                ESP32 membandingkan nilai sensor dengan batas kalibrasi, lalu
+                menentukan tindakan yang diambil.
+              </p>
+            </div>
+          </div>
+          <i></i>
+          <div class="col">
+            <div class="card">
+              <span class="ico">📤</span>
+              <h3>Output (Aktuator)</h3>
+              <p>
+                Motor servo menggerakkan jemuran (0° masuk, 90° keluar) dan LED
+                menyala sebagai lampu rumah.
+              </p>
+            </div>
+            <div class="card">
+              <span class="ico">📱</span>
+              <h3>Monitoring (Blynk)</h3>
+              <p>
+                Data dikirim ke Blynk Cloud melalui Wi-Fi, sehingga sistem dapat
+                dipantau dan dikendalikan dari jarak jauh.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="title"><h2>Logika kerja 🧩</h2></div>
+        <div class="split">
+          <div class="col">
+            <div class="card">
+              <h3>Otomatis · Cerah</h3>
+              <p>
+                LDR rendah dan tidak hujan: servo 90° (jemuran keluar), LED
+                mati.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Otomatis · Hujan</h3>
+              <p>
+                Hujan terdeteksi: servo 0° (jemuran masuk) meskipun LDR masih
+                terang.
+              </p>
+            </div>
+          </div>
+          <i></i>
+          <div class="col">
+            <div class="card">
+              <h3>Otomatis · Gelap</h3>
+              <p>
+                LDR melewati batas kalibrasi (misal 2000): LED menyala dan servo
+                0° karena embun malam tidak baik untuk jemuran.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Manual</h3>
+              <p>
+                Seluruh sensor diabaikan. Pengguna mengendalikan lampu dan
+                jemuran penuh lewat tombol di aplikasi Blynk.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="title"><h2>Datastream Blynk 📱</h2></div>
+        <div class="card flat wide" style="overflow-x: auto">
+          <table>
+            <tr>
+              <th>Pin</th>
+              <th>Fungsi</th>
+              <th>Nilai</th>
+            </tr>
+            <tr>
+              <td><span class="pin">V0</span></td>
+              <td>LDR</td>
+              <td>0–4095 (intensitas cahaya)</td>
+            </tr>
+            <tr>
+              <td><span class="pin">V1</span></td>
+              <td>Lampu</td>
+              <td>0 = Mati, 1 = Nyala</td>
+            </tr>
+            <tr>
+              <td><span class="pin">V2</span></td>
+              <td>Hujan</td>
+              <td>0 = Kering, 1 = Hujan</td>
+            </tr>
+            <tr>
+              <td><span class="pin">V3</span></td>
+              <td>Jemuran</td>
+              <td>0 = Masuk, 1 = Keluar</td>
+            </tr>
+            <tr>
+              <td><span class="pin">V4</span></td>
+              <td>Mode Auto</td>
+              <td>0 = Manual, 1 = Otomatis</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="title"><h2>Coba simulasinya 🎮</h2></div>
+        <div class="card flat sim wide">
+          <label>Nilai LDR: <b id="ldrv"></b></label>
+          <input id="ldr" type="range" min="0" max="4095" value="1200" />
+          <label
+            >Batas kalibrasi <input id="th" type="number" value="2000"
+          /></label>
+          <label><input id="rain" type="checkbox" /> Hujan (V2)</label>
+          <label
+            ><input id="auto" type="checkbox" checked /> Mode Auto (V4)</label
+          >
+          <div id="mpanel">
+            <label><input id="mlamp" type="checkbox" /> Lampu (V1)</label
+            ><label
+              ><input id="mjem" type="checkbox" checked /> Jemuran keluar
+              (V3)</label
+            >
+          </div>
+          <div class="tiles">
+            <div class="tile" id="t-mode"></div>
+            <div class="tile" id="t-lamp"></div>
+            <div class="tile" id="t-jem"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
